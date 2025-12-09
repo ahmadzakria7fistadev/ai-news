@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import { CursorFollower } from "@/components/CursorFollower";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body className="bg-[#030014] text-white antialiased overflow-y-scroll overflow-x-hidden selection:bg-purple-500/30">
+        <CursorFollower />
         {children}
       </body>
     </html>
