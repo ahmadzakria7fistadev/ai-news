@@ -51,23 +51,33 @@ allowed_origins = [
     "http://127.0.0.1:3000",
 ]
 
-# CORS Configuration
-# Allow all Vercel domains using regex pattern
-# This matches any Vercel preview or production domain: https://*.vercel.app
-vercel_pattern = r"https://.*\.vercel\.app"
+# CORS Configuration - Allow all origins for production
+# This ensures all Vercel preview and production domains work
 
-# Configure CORS middleware
-# Note: When using allow_origin_regex, we can't use allow_origins together
-# So we'll use regex for Vercel and handle localhost separately if needed
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=vercel_pattern,  # Matches all Vercel domains
-    allow_credentials=False,  # Set to False when using regex with wildcards
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=3600,  # Cache preflight requests for 1 hour
-)
+# Check if we're in production (Vercel deployment)
+is_production = os.getenv("ENVIRONMENT") == "production" or os.getenv("VERCEL") == "1"
+
+if is_production:
+    # Production: Allow all origins (Vercel uses different domains for previews)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins in production
+        allow_credentials=False,  # Must be False when using "*"
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+        max_age=3600,
+    )
+else:
+    # Development: Allow localhost and specific origins
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+    )
 
 # Request/Response models
 class AgentRequest(BaseModel):
