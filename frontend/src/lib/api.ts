@@ -52,20 +52,33 @@ export async function getLiveNews(
   categories?: string[],
   sessionId?: string
 ): Promise<LiveNewsResponse> {
-  const response = await fetch(`${API_URL}/api/live-news`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      categories: categories || ["ai", "crypto", "politics", "health", "pakistan", "sports", "world"],
-      session_id: sessionId,
-    }),
-  });
+  try {
+    const response = await fetch(`${API_URL}/api/live-news`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        categories: categories || ["ai"],
+        session_id: sessionId,
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`API error: ${response.statusText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = `API error: ${response.statusText}`;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.detail || errorMessage;
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching live news:", error);
+    throw error;
   }
-
-  return response.json();
 }

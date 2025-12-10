@@ -86,7 +86,16 @@ class Runner:
                 final_output=response.choices[0].message.content or ""
             )
         except Exception as e:
-            raise Exception(f"Error running agent: {str(e)}")
+            error_str = str(e)
+            # Check for quota/rate limit errors
+            if "429" in error_str or "insufficient_quota" in error_str or "quota" in error_str.lower():
+                raise Exception("OpenAI API quota exceeded. Please check your OpenAI account billing and add credits. Visit https://platform.openai.com/account/billing to add credits.")
+            elif "401" in error_str or "invalid_api_key" in error_str.lower():
+                raise Exception("Invalid OpenAI API key. Please check your OPENAI_API_KEY in the .env file.")
+            elif "rate_limit" in error_str.lower():
+                raise Exception("OpenAI API rate limit exceeded. Please wait a moment and try again.")
+            else:
+                raise Exception(f"Error running agent: {str(e)}")
     
     @staticmethod
     def run_sync(agent: Agent, query: str) -> Any:
@@ -110,7 +119,16 @@ class Runner:
                 final_output=response.choices[0].message.content or ""
             )
         except Exception as e:
-            raise Exception(f"Error running agent: {str(e)}")
+            error_str = str(e)
+            # Check for quota/rate limit errors
+            if "429" in error_str or "insufficient_quota" in error_str or "quota" in error_str.lower():
+                raise Exception("OpenAI API quota exceeded. Please check your OpenAI account billing and add credits. Visit https://platform.openai.com/account/billing to add credits.")
+            elif "401" in error_str or "invalid_api_key" in error_str.lower():
+                raise Exception("Invalid OpenAI API key. Please check your OPENAI_API_KEY in the .env file.")
+            elif "rate_limit" in error_str.lower():
+                raise Exception("OpenAI API rate limit exceeded. Please wait a moment and try again.")
+            else:
+                raise Exception(f"Error running agent: {str(e)}")
 
 
 # Re-export for convenience

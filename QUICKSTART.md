@@ -93,3 +93,4 @@ curl -X POST http://localhost:8000/api/news \
 
 - Update `FRONTEND_URL` in backend `.env` if frontend runs on different port
 
+

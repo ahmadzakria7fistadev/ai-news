@@ -41,3 +41,4 @@ The API will be available at `http://localhost:8000`
 - **Forbes Agent**: Analyzes Forbes articles
 - **Web Search Agent**: Searches the web for AI news
 
+

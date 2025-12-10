@@ -115,3 +115,4 @@ npm run dev
 - Ensure `FRONTEND_URL` in backend `.env` matches your frontend URL
 - Check browser console for specific CORS error messages
 
+

@@ -240,8 +240,31 @@ export const LiveNewsSection = () => {
       const parsed = parseNewsResponse(response.result);
       setParsedNews(parsed);
       setLastUpdate(new Date());
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching live news:", error);
+      // Show user-friendly error message
+      let errorMessage = error?.message || "Failed to fetch news. Please check if backend is running.";
+      
+      // Handle specific error cases
+      if (errorMessage.includes("quota") || errorMessage.includes("429")) {
+        errorMessage = "OpenAI API quota exceeded. Please add credits to your OpenAI account at https://platform.openai.com/account/billing";
+      } else if (errorMessage.includes("Invalid") && errorMessage.includes("API")) {
+        errorMessage = "Invalid OpenAI API key. Please check your backend configuration.";
+      }
+      
+      // Show error in UI instead of alert
+      setParsedNews({
+        breaking: [],
+        updates: [{
+          title: "Error Loading News",
+          summary: errorMessage,
+          source: "System",
+          url: "#",
+          image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop",
+          time: "Now"
+        }],
+        highlights: []
+      });
     } finally {
       setLoading(false);
     }

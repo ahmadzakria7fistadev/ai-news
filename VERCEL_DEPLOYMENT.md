@@ -125,3 +125,4 @@ ENVIRONMENT=production
 3. Verify all environment variables are set correctly
 4. Make sure both frontend and backend are deployed
 
+

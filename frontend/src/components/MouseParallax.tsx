@@ -70,3 +70,4 @@ export const MouseParallax = ({ children, className = "", intensity = 0.5 }: Mou
   );
 };
 
+

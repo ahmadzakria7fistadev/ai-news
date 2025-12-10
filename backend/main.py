@@ -412,6 +412,7 @@ async def download_audio(filename: str):
 async def get_live_news(request: LiveNewsRequest):
     """Get live news updates in real-time - AI news only"""
     try:
+        import traceback
         # Force AI category only - ignore other categories
         query = "Get the latest AI (Artificial Intelligence) related news updates from the web. Search for real AI news from sources like TechCrunch, The Verge, MIT Technology Review, Reuters Tech, and BBC Technology. Focus ONLY on: Machine Learning, Deep Learning, Neural Networks, AI Research, AI Companies, AI Tools, AI Ethics, AI Regulations, AI Breakthroughs, and AI Applications. Provide the news in the readable format as specified in your instructions. Include actual headlines, summaries, sources, URLs, and timestamps. Filter out any non-AI content. DO NOT mention JSON format - directly provide the news."
         
@@ -427,8 +428,29 @@ async def get_live_news(request: LiveNewsRequest):
             "categories": ["ai"],  # Always AI only
             "update_time": "live"
         }
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_details = traceback.format_exc()
+        error_message = str(e)
+        
+        # Check for quota errors and return appropriate status code
+        if "quota" in error_message.lower() or "429" in error_message:
+            print(f"Quota error in /api/live-news: {error_message}\n{error_details}")
+            raise HTTPException(
+                status_code=402,  # Payment Required
+                detail=error_message
+            )
+        elif "invalid" in error_message.lower() and "api" in error_message.lower():
+            print(f"API key error in /api/live-news: {error_message}\n{error_details}")
+            raise HTTPException(
+                status_code=401,  # Unauthorized
+                detail=error_message
+            )
+        else:
+            print(f"Error in /api/live-news: {error_message}\n{error_details}")
+            raise HTTPException(status_code=500, detail=f"Internal Server Error: {error_message}")
 
 if __name__ == "__main__":
     import uvicorn
