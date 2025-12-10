@@ -1,4 +1,15 @@
+// API URL configuration
+// In Vercel, set NEXT_PUBLIC_API_URL environment variable to your backend URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// Log warning in production if API URL is not set
+if (typeof window !== "undefined" && window.location.hostname.includes("vercel.app") && !process.env.NEXT_PUBLIC_API_URL) {
+  console.error(
+    "⚠️ NEXT_PUBLIC_API_URL is not set! " +
+    "Please add it in Vercel Settings → Environment Variables. " +
+    "Current API URL:", API_URL
+  );
+}
 
 export interface AgentResponse {
   result: string;

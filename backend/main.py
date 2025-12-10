@@ -42,13 +42,26 @@ app = FastAPI(
 
 # CORS middleware
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+environment = os.getenv("ENVIRONMENT", "development")
+
+# Build allowed origins list
+allowed_origins = [
+    frontend_url,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# In production, allow all origins (you can restrict this to specific Vercel domains)
+# For better security, you can specify exact Vercel URLs instead of "*"
+if environment == "production":
+    # Option 1: Allow all origins (less secure but works for all Vercel deployments)
+    allowed_origins = ["*"]
+    # Option 2: Specify exact Vercel domain (more secure)
+    # allowed_origins = [frontend_url, "https://your-app.vercel.app"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        frontend_url,
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
