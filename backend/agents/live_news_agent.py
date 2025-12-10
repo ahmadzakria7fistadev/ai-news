@@ -25,42 +25,62 @@ IMPORTANT: ONLY return AI-related news. Filter out any non-AI content including:
 - Health (unless AI in healthcare)
 - Sports, Entertainment, or other non-AI topics
 
-Format your response as JSON with this structure:
-{
-  "timestamp": "Current date and time",
-  "breaking_news": [
-    {
-      "title": "News headline",
-      "summary": "Brief summary",
-      "source": "Source name",
-      "url": "Article URL",
-      "image_url": "Image URL if available",
-      "time": "Time of publication"
-    }
-  ],
-  "latest_updates": [
-    {
-      "title": "News headline",
-      "summary": "Brief summary",
-      "source": "Source name",
-      "url": "Article URL",
-      "image_url": "Image URL if available",
-      "time": "Time of publication"
-    }
-  ],
-  "highlights": [
-    {
-      "title": "News headline",
-      "summary": "Brief summary",
-      "source": "Source name",
-      "url": "Article URL",
-      "image_url": "Image URL if available",
-      "time": "Time of publication"
-    }
-  ]
-}
+Format your response in a clear, readable, live news format:
 
-For image URLs, try to extract from the article or use relevant AI-themed placeholder images. If no image is available, use: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop" (AI-themed image)
+📰 LIVE AI NEWS UPDATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏰ Last Updated: [Current date and time]
+🌍 Coverage: Global AI News
+
+🔥 BREAKING NEWS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚨 [Headline]
+📍 Location: [Country/Region if applicable]
+⏰ Time: [Time of publication]
+📰 Source: [Source name]
+
+[Brief summary - 2-3 sentences explaining the breaking AI news]
+
+🔗 Read more: [Article URL]
+
+[Repeat for each breaking news item]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 LATEST UPDATES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• [Headline]
+  📍 [Location] | ⏰ [Time] | 📰 [Source]
+  [Brief summary - 1-2 sentences]
+  🔗 [Article URL]
+
+[Repeat for each latest update - show 5-8 items]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 KEY HIGHLIGHTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• [Headline] - [Brief summary] | 📰 [Source] | 🔗 [URL]
+• [Headline] - [Brief summary] | 📰 [Source] | 🔗 [URL]
+• [Headline] - [Brief summary] | 📰 [Source] | 🔗 [URL]
+
+[Show 3-5 key highlights]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📈 TODAY'S AI NEWS SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Overall summary of today's AI news - 2-3 paragraphs explaining the main developments, trends, and what's happening in the AI world right now]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For image URLs in articles, try to extract from the article or use relevant AI-themed placeholder images. If no image is available, use: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop" (AI-themed image)
+
+If no AI news is found, return:
+"No AI news updates available at this time. Monitoring continues for the latest AI developments worldwide."
 
 Always ensure:
 - News is current and verified (last 24 hours)
