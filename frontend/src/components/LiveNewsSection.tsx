@@ -29,45 +29,132 @@ export const LiveNewsSection = () => {
 
   const parseNewsResponse = (response: string) => {
     try {
-      // Try to parse as JSON first
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        return {
-          breaking: Array.isArray(parsed.breaking_news) ? parsed.breaking_news : [],
-          updates: Array.isArray(parsed.latest_updates) ? parsed.latest_updates : [],
-          highlights: Array.isArray(parsed.highlights) ? parsed.highlights : [],
-        };
+      const breaking: NewsItem[] = [];
+      const updates: NewsItem[] = [];
+      const highlights: NewsItem[] = [];
+
+      // Helper function to extract news items from text
+      const extractNewsItem = (text: string, startMarker: string): NewsItem | null => {
+        const lines = text.split('\n');
+        let title = '';
+        let summary = '';
+        let source = 'AI News Desk';
+        let url = '#';
+        let time = 'Just now';
+        let location = '';
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          
+          if (line.includes('🚨') || (startMarker === '•' && line.startsWith('•'))) {
+            title = line.replace(/[🚨•]/g, '').trim();
+          } else if (line.includes('📍') && line.includes('Location:')) {
+            location = line.replace(/📍\s*Location:\s*/i, '').trim();
+          } else if (line.includes('⏰') && line.includes('Time:')) {
+            time = line.replace(/⏰\s*Time:\s*/i, '').trim();
+          } else if (line.includes('📰') && line.includes('Source:')) {
+            source = line.replace(/📰\s*Source:\s*/i, '').trim();
+          } else if (line.includes('🔗') && (line.includes('Read more:') || line.includes('http'))) {
+            url = line.replace(/🔗\s*(Read more:)?\s*/i, '').trim();
+          } else if (line.length > 20 && !line.includes('━━') && !line.includes('📍') && !line.includes('⏰') && !line.includes('📰') && !line.includes('🔗') && !line.includes('🚨')) {
+            if (!summary) {
+              summary = line;
+            } else if (summary.length < 200) {
+              summary += ' ' + line;
+            }
+          }
+        }
+
+        if (title && title.length > 5) {
+          return {
+            title: title.substring(0, 150),
+            summary: summary || 'Latest AI development',
+            source: source,
+            url: url,
+            image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop",
+            time: time
+          };
+        }
+        return null;
+      };
+
+      // Split response into sections
+      const sections = response.split(/━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━/);
+      
+      sections.forEach((section) => {
+        const sectionText = section.trim();
+        
+        // Breaking News section
+        if (sectionText.includes('🔥') && sectionText.includes('BREAKING NEWS')) {
+          const breakingItems = sectionText.split(/🚨/).slice(1); // Skip first empty part
+          breakingItems.forEach((item) => {
+            const newsItem = extractNewsItem(item, '🚨');
+            if (newsItem) breaking.push(newsItem);
+          });
+        }
+        
+        // Latest Updates section
+        if (sectionText.includes('📊') && sectionText.includes('LATEST UPDATES')) {
+          const updateItems = sectionText.split(/•/).slice(1); // Skip first empty part
+          updateItems.forEach((item) => {
+            const newsItem = extractNewsItem(item, '•');
+            if (newsItem) updates.push(newsItem);
+          });
+        }
+        
+        // Key Highlights section
+        if (sectionText.includes('💡') && sectionText.includes('KEY HIGHLIGHTS')) {
+          const highlightItems = sectionText.split(/•/).slice(1); // Skip first empty part
+          highlightItems.forEach((item) => {
+            const parts = item.split('|');
+            if (parts.length >= 3) {
+              const titlePart = parts[0].replace(/[💡•]/g, '').trim();
+              const summaryPart = parts[0].includes('-') ? parts[0].split('-')[1]?.trim() : titlePart;
+              const sourcePart = parts[1]?.replace(/📰/g, '').trim() || 'AI News Desk';
+              const urlPart = parts[2]?.replace(/🔗/g, '').trim() || '#';
+              
+              if (titlePart && titlePart.length > 5) {
+                highlights.push({
+                  title: titlePart.substring(0, 100),
+                  summary: summaryPart || 'Latest AI development',
+                  source: sourcePart,
+                  url: urlPart,
+                  image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop",
+                  time: 'Today'
+                });
+              }
+            }
+          });
+        }
+      });
+
+      // Fallback: If no structured items found, create items from any headlines
+      if (breaking.length === 0 && updates.length === 0 && highlights.length === 0) {
+        const lines = response.split('\n').filter(l => {
+          const trimmed = l.trim();
+          return trimmed.length > 20 && trimmed.length < 200 && 
+                 !trimmed.includes('━━') && 
+                 !trimmed.match(/^[📍⏰📰🔗🚨🔥📊💡]/) &&
+                 !trimmed.match(/^(Location|Time|Source|Read more):/i);
+        });
+        
+        lines.slice(0, 5).forEach((line, i) => {
+          updates.push({
+            title: line.substring(0, 100),
+            summary: line.length > 100 ? line.substring(100, 250) : 'Latest AI development',
+            source: 'AI News Desk',
+            url: '#',
+            image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop",
+            time: 'Just now'
+          });
+        });
       }
-      
-      // Fallback: Try to extract news items from text format
-      const breakingMatches = response.match(/🔥\s*BREAKING NEWS:?[\s\S]*?(?=📊|💡|$)/i);
-      const updatesMatches = response.match(/📊\s*CATEGORY UPDATES:?[\s\S]*?(?=💡|$)/i);
-      const highlightsMatches = response.match(/💡\s*KEY HIGHLIGHTS:?[\s\S]*?$/i);
-      
-      const extractItems = (text: string) => {
-        if (!text) return [];
-        // Try to extract structured items or create placeholder
-        const lines = text.split('\n').filter(l => l.trim() && !l.trim().startsWith('🔥') && !l.trim().startsWith('📊') && !l.trim().startsWith('💡') && !l.trim().startsWith('━'));
-        return lines.slice(0, 3).map((line, i) => ({
-          title: line.substring(0, 100) || `AI News Update ${i + 1}`,
-          summary: line.substring(100, 200) || "Latest AI development",
-          source: "AI News Desk",
-          url: "#",
-          image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop",
-          time: "Just now"
-        }));
-      };
-      
-      return {
-        breaking: extractItems(breakingMatches?.[0] || ""),
-        updates: extractItems(updatesMatches?.[0] || ""),
-        highlights: extractItems(highlightsMatches?.[0] || ""),
-      };
+
+      return { breaking, updates, highlights };
     } catch (e) {
       console.error("Failed to parse news:", e);
+      return { breaking: [], updates: [], highlights: [] };
     }
-    return { breaking: [], updates: [], highlights: [] };
   };
 
   const fetchNews = async () => {
