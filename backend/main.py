@@ -51,21 +51,22 @@ allowed_origins = [
     "http://127.0.0.1:3000",
 ]
 
-# In production, allow all origins (you can restrict this to specific Vercel domains)
-# For better security, you can specify exact Vercel URLs instead of "*"
-if environment == "production":
-    # Option 1: Allow all origins (less secure but works for all Vercel deployments)
-    allowed_origins = ["*"]
-    # Option 2: Specify exact Vercel domain (more secure)
-    # allowed_origins = [frontend_url, "https://your-app.vercel.app"]
+# CORS Configuration
+# Allow all Vercel domains using regex pattern
+# This matches any Vercel preview or production domain: https://*.vercel.app
+vercel_pattern = r"https://.*\.vercel\.app"
 
+# Configure CORS middleware
+# Note: When using allow_origin_regex, we can't use allow_origins together
+# So we'll use regex for Vercel and handle localhost separately if needed
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_origin_regex=vercel_pattern,  # Matches all Vercel domains
+    allow_credentials=False,  # Set to False when using regex with wildcards
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 # Request/Response models
@@ -132,6 +133,19 @@ multi_agent_newsroom = MultiAgentNewsroomSystem()
 ultimate_ai_news = UltimateAINewsAgent()
 live_news_agent = LiveNewsAgent()
 agent_runner = AgentRunner()
+
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """Handle OPTIONS requests for CORS preflight"""
+    return JSONResponse(
+        content={},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+        }
+    )
 
 @app.get("/")
 async def root():
