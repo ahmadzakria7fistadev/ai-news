@@ -413,7 +413,7 @@ async def get_live_news(request: LiveNewsRequest):
     """Get live news updates in real-time - AI news only"""
     try:
         # Force AI category only - ignore other categories
-        query = "Get the latest AI (Artificial Intelligence) related news updates. Focus ONLY on: Machine Learning, Deep Learning, Neural Networks, AI Research, AI Companies, AI Tools, AI Ethics, AI Regulations, AI Breakthroughs, and AI Applications. Return news in JSON format with title, summary, source, url, image_url, and time for each item. Filter out any non-AI content."
+        query = "Get the latest AI (Artificial Intelligence) related news updates from the web. Search for real AI news from sources like TechCrunch, The Verge, MIT Technology Review, Reuters Tech, and BBC Technology. Focus ONLY on: Machine Learning, Deep Learning, Neural Networks, AI Research, AI Companies, AI Tools, AI Ethics, AI Regulations, AI Breakthroughs, and AI Applications. Provide the news in the readable format as specified in your instructions. Include actual headlines, summaries, sources, URLs, and timestamps. Filter out any non-AI content. DO NOT mention JSON format - directly provide the news."
         
         result = await agent_runner.run_async(
             agent=live_news_agent,
