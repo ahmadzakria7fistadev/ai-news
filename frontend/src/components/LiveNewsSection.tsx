@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Radio, RefreshCw, Clock, TrendingUp, ExternalLink, Image as ImageIcon } from "lucide-react";
+import { Radio, RefreshCw, Clock, TrendingUp, ExternalLink } from "lucide-react";
 import { getLiveNews, LiveNewsResponse } from "@/lib/api";
 import { ParallaxElement } from "./ParallaxElement";
+import Image from "next/image";
 
 interface NewsItem {
   title: string;
@@ -107,33 +108,33 @@ export const LiveNewsSection = () => {
   };
 
   return (
-    <section id="live-news" className="py-24 bg-[#030014] relative z-10">
+    <section id="live-news" className="py-12 bg-gray-50 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <ParallaxElement speed={0.1} direction="vertical">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-sm text-red-400 mb-4">
-                <Radio className="w-4 h-4 animate-pulse" />
-                <span className="font-medium">LIVE</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white text-xs font-bold mb-3">
+                <Radio className="w-3 h-3 animate-pulse" />
+                LIVE
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold font-[family-name:var(--font-outfit)] text-white mb-4">
-                <span className="text-gradient">Live AI News</span> Updates
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+                AI News
               </h2>
-              <p className="text-gray-400 max-w-xl text-base">
-                Real-time AI news updates powered by AI agents. Stay informed with the latest AI breakthroughs, research, and developments.
+              <p className="text-gray-600 text-base max-w-2xl">
+                Latest artificial intelligence news, research, and developments from around the world.
               </p>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Clock className="w-4 h-4" />
-                {lastUpdate ? `Updated: ${formatTime(lastUpdate)}` : "Not updated yet"}
+                {lastUpdate ? `Last updated: ${formatTime(lastUpdate)}` : "Not updated yet"}
               </div>
               <button
                 onClick={fetchNews}
                 disabled={loading}
-                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
                 Refresh
@@ -142,215 +143,193 @@ export const LiveNewsSection = () => {
           </div>
         </ParallaxElement>
 
-        {/* AI News Badge */}
-        <ParallaxElement speed={0.15} direction="both">
-          <div className="flex items-center justify-center mb-8">
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-600/20 to-cyan-600/20 border border-purple-500/30 text-purple-300">
-              <span className="text-2xl">🤖</span>
-              <span className="font-semibold">AI News Only</span>
-            </div>
-          </div>
-        </ParallaxElement>
 
-        {/* News Content */}
+        {/* News Content - BBC Style Layout */}
         <ParallaxElement speed={0.2} direction="both">
           {loading && !parsedNews ? (
-            <div className="glass-card rounded-2xl p-8 min-h-[400px] flex items-center justify-center">
+            <div className="bg-white rounded-lg p-8 min-h-[400px] flex items-center justify-center">
               <div className="text-center">
-                <RefreshCw className="w-12 h-12 text-cyan-400 animate-spin mx-auto mb-4" />
-                <p className="text-gray-400">Fetching latest AI news...</p>
+                <RefreshCw className="w-12 h-12 text-gray-400 animate-spin mx-auto mb-4" />
+                <p className="text-gray-600">Fetching latest AI news...</p>
               </div>
             </div>
           ) : parsedNews ? (
-            <div className="space-y-8">
-              {/* Breaking News */}
+            <div className="bg-white rounded-lg overflow-hidden">
+              {/* Main Featured Story - Top */}
               {parsedNews.breaking.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <span className="text-2xl">🔥</span>
-                    <h3 className="text-2xl font-bold text-red-400">Breaking News</h3>
+                <div className="border-b border-gray-200">
+                  <div className="bg-red-600 text-white px-4 py-2 text-sm font-semibold">
+                    BREAKING NEWS
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {parsedNews.breaking.map((item, i) => (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+                    {parsedNews.breaking.slice(0, 1).map((item, i) => (
                       <motion.div
                         key={i}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="glass-card rounded-xl overflow-hidden group hover:border-cyan-500/50 transition-all duration-300"
+                        className="md:col-span-2"
                       >
-                        <div className="relative h-48 bg-gradient-to-br from-purple-600/20 to-cyan-600/20 overflow-hidden">
-                          {item.image_url ? (
-                            <img
-                              src={item.image_url}
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop";
-                              }}
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600/30 to-cyan-600/30">
-                              <ImageIcon className="w-16 h-16 text-white/30" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <span className="text-xs text-red-400 font-semibold bg-red-500/20 px-2 py-1 rounded">BREAKING</span>
-                          </div>
+                        <div className="relative w-full h-64 md:h-80 mb-4 rounded overflow-hidden bg-gray-200">
+                          <img
+                            src={item.image_url || "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=800&fit=crop"}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=800&fit=crop";
+                            }}
+                          />
                         </div>
-                        <div className="p-5">
-                          <h4 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-cyan-400 transition-colors">
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight">
+                          <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">
                             {item.title}
-                          </h4>
-                          <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-                            {item.summary}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span>{item.source}</span>
-                              <span>•</span>
-                              <span>{item.time}</span>
-                            </div>
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 text-sm"
-                            >
-                              Read More
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          </div>
+                          </a>
+                        </h2>
+                        <p className="text-gray-700 text-base leading-relaxed mb-3">
+                          {item.summary}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <span>{item.source}</span>
+                          <span>•</span>
+                          <span>{item.time}</span>
                         </div>
                       </motion.div>
                     ))}
+                    
+                    {/* Side Stories */}
+                    <div className="space-y-4">
+                      {parsedNews.breaking.slice(1, 3).map((item, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className="border-b border-gray-200 pb-4 last:border-0"
+                        >
+                          <div className="flex gap-3">
+                            <div className="relative w-24 h-24 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+                              <img
+                                src={item.image_url || "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=300&fit=crop"}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=300&fit=crop";
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2 leading-snug">
+                                <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">
+                                  {item.title}
+                                </a>
+                              </h3>
+                              <p className="text-xs text-gray-600 line-clamp-2">
+                                {item.summary}
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Latest Updates */}
+              {/* Latest News Grid */}
               {parsedNews.updates.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <TrendingUp className="w-6 h-6 text-cyan-400" />
-                    <h3 className="text-2xl font-bold text-white">Latest Updates</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-gray-900">
+                    Latest AI News
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {parsedNews.updates.map((item, i) => (
-                      <motion.div
+                      <motion.article
                         key={i}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="glass-card rounded-xl overflow-hidden group hover:border-purple-500/50 transition-all duration-300"
+                        transition={{ delay: i * 0.05 }}
+                        className="group"
                       >
-                        <div className="relative h-40 bg-gradient-to-br from-purple-600/20 to-cyan-600/20 overflow-hidden">
-                          {item.image_url ? (
-                            <img
-                              src={item.image_url}
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop";
-                              }}
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600/30 to-cyan-600/30">
-                              <ImageIcon className="w-12 h-12 text-white/30" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                        <div className="relative w-full h-48 mb-3 rounded overflow-hidden bg-gray-200">
+                          <img
+                            src={item.image_url || "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop"}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop";
+                            }}
+                          />
                         </div>
-                        <div className="p-4">
-                          <h4 className="text-base font-bold text-white mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                        <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-red-600 transition-colors">
+                          <a href={item.url} target="_blank" rel="noopener noreferrer">
                             {item.title}
-                          </h4>
-                          <p className="text-gray-400 text-sm mb-3 line-clamp-2">
-                            {item.summary}
-                          </p>
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-gray-500">{item.source}</span>
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-cyan-400 hover:text-cyan-300 transition-colors"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </div>
+                          </a>
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-2 line-clamp-3 leading-relaxed">
+                          {item.summary}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{item.source}</span>
+                          <span>{item.time}</span>
                         </div>
-                      </motion.div>
+                      </motion.article>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Highlights */}
+              {/* More Stories - Horizontal Layout */}
               {parsedNews.highlights.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <span className="text-2xl">💡</span>
-                    <h3 className="text-2xl font-bold text-purple-400">Key Highlights</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-gray-900">
+                    More Stories
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {parsedNews.highlights.map((item, i) => (
-                      <motion.div
+                      <motion.article
                         key={i}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="glass-card rounded-lg p-4 flex gap-4 group hover:border-purple-500/50 transition-all duration-300"
+                        className="flex gap-4 group"
                       >
-                        <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-purple-600/20 to-cyan-600/20">
-                          {item.image_url ? (
-                            <img
-                              src={item.image_url}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop";
-                              }}
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <ImageIcon className="w-8 h-8 text-white/30" />
-                            </div>
-                          )}
+                        <div className="relative w-32 h-32 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+                          <img
+                            src={item.image_url || "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop"}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop";
+                            }}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-white mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
-                            {item.title}
-                          </h4>
-                          <p className="text-gray-400 text-xs mb-2 line-clamp-2">
+                          <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 leading-snug group-hover:text-red-600 transition-colors">
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">
+                              {item.title}
+                            </a>
+                          </h3>
+                          <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-2">
                             {item.summary}
                           </p>
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-cyan-400 hover:text-cyan-300 transition-colors text-xs flex items-center gap-1"
-                          >
-                            Read
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
+                          <div className="text-xs text-gray-500">
+                            {item.source} • {item.time}
+                          </div>
                         </div>
-                      </motion.div>
+                      </motion.article>
                     ))}
                   </div>
                 </div>
               )}
 
               {parsedNews.breaking.length === 0 && parsedNews.updates.length === 0 && parsedNews.highlights.length === 0 && (
-                <div className="glass-card rounded-2xl p-8 text-center text-gray-400">
+                <div className="p-8 text-center text-gray-600">
                   <p>No AI news available. Click refresh to fetch latest updates.</p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="glass-card rounded-2xl p-8 min-h-[400px] flex items-center justify-center">
-              <div className="text-center text-gray-400">
+            <div className="bg-white rounded-lg p-8 min-h-[400px] flex items-center justify-center">
+              <div className="text-center text-gray-600">
                 <p>No news available. Click refresh to fetch latest AI news updates.</p>
               </div>
             </div>
