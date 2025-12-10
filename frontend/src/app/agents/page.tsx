@@ -6,7 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { ParallaxElement } from "@/components/ParallaxElement";
 import { 
   Search, Youtube, Newspaper, Globe, TrendingUp, 
-  AlertCircle, FileText, Sparkles, Zap, Users, ArrowRight
+  AlertCircle, FileText, Sparkles, Zap, Users, ArrowRight, Radio
 } from "lucide-react";
 
 const allAgents = [
@@ -90,6 +90,14 @@ const allAgents = [
     gradient: "from-blue-600 to-purple-600",
     stats: { accuracy: "99%", speed: "Real-time" }
   },
+  {
+    id: "live_news",
+    name: "Live News Agent",
+    description: "Real-time news updates with live feed monitoring and breaking news alerts",
+    icon: Radio,
+    gradient: "from-red-600 to-orange-600",
+    stats: { accuracy: "99%", speed: "Live" }
+  },
 ];
 
 export default function AgentsPage() {
@@ -122,7 +130,7 @@ export default function AgentsPage() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-premium border border-white/10 mb-5"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#6366f1]" />
-              <span className="text-xs text-white/90 font-medium">10 Premium AI Agents</span>
+              <span className="text-xs text-white/90 font-medium">11 Premium AI Agents</span>
             </motion.div>
             
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">

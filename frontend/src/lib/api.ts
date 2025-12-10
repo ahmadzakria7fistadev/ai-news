@@ -6,6 +6,13 @@ export interface AgentResponse {
   agent_type?: string;
 }
 
+export interface LiveNewsResponse {
+  result: string;
+  session_id: string;
+  categories: string[];
+  update_time: string;
+}
+
 export async function runAgent(
   agentType: string,
   query: string,
@@ -19,6 +26,28 @@ export async function runAgent(
     body: JSON.stringify({
       query,
       agent_type: agentType,
+      session_id: sessionId,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`API error: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function getLiveNews(
+  categories?: string[],
+  sessionId?: string
+): Promise<LiveNewsResponse> {
+  const response = await fetch(`${API_URL}/api/live-news`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      categories: categories || ["ai", "crypto", "politics", "health", "pakistan", "sports", "world"],
       session_id: sessionId,
     }),
   });

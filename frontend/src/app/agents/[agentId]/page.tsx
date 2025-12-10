@@ -69,6 +69,12 @@ const agents = {
     gradient: "from-blue-600 to-purple-600",
     features: ["Complete Solution", "All Features", "Priority Support", "Custom Workflows"]
   },
+  live_news: {
+    name: "Live News Agent",
+    description: "Real-time news updates with live feed monitoring and breaking news alerts",
+    gradient: "from-red-600 to-orange-600",
+    features: ["Real-time Updates", "Live Feed Monitoring", "Breaking News Alerts", "Category Filtering"]
+  },
 };
 
 export default function AgentPage() {

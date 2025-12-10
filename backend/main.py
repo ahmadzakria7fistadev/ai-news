@@ -21,6 +21,7 @@ from agents import (
     NewsSummarizerAgent,
     MultiAgentNewsroomSystem,
     UltimateAINewsAgent,
+    LiveNewsAgent,
     AgentRunner
 )
 
@@ -40,12 +41,18 @@ app = FastAPI(
 )
 
 # CORS middleware
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("FRONTEND_URL", "http://localhost:3000")],
+    allow_origins=[
+        frontend_url,
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Request/Response models
@@ -95,6 +102,10 @@ class UltimateNewsRequest(BaseModel):
     language: Optional[str] = "english"  # "english", "urdu", "bilingual"
     session_id: Optional[str] = None
 
+class LiveNewsRequest(BaseModel):
+    categories: Optional[List[str]] = None  # ["ai", "crypto", "politics", "health", "pakistan", "sports", "world"]
+    session_id: Optional[str] = None
+
 # Initialize all agents
 seo_agent = SEOAgent()
 youtube_agent = YouTubeAgent()
@@ -106,6 +117,7 @@ news_research = NewsResearchAgent()
 news_summarizer = NewsSummarizerAgent()
 multi_agent_newsroom = MultiAgentNewsroomSystem()
 ultimate_ai_news = UltimateAINewsAgent()
+live_news_agent = LiveNewsAgent()
 agent_runner = AgentRunner()
 
 @app.get("/")
@@ -131,6 +143,7 @@ async def run_agent(request: AgentRequest):
             "news_summarizer": news_summarizer,
             "multi_agent_newsroom": multi_agent_newsroom,
             "ultimate_ai_news": ultimate_ai_news,
+            "live_news": live_news_agent,
         }
         
         if request.agent_type not in agent_map:
@@ -177,6 +190,7 @@ async def get_news(request: NewsRequest):
             "news_summarizer": news_summarizer,
             "multi_agent_newsroom": multi_agent_newsroom,
             "ultimate_ai_news": ultimate_ai_news,
+            "live_news": live_news_agent,
         }
         
         session_id = request.session_id or agent_runner.create_session_id()
@@ -356,6 +370,28 @@ async def download_audio(filename: str):
     if os.path.exists(file_path):
         return FileResponse(file_path, media_type="audio/mpeg", filename=filename)
     raise HTTPException(status_code=404, detail="Audio file not found")
+
+@app.post("/api/live-news")
+async def get_live_news(request: LiveNewsRequest):
+    """Get live news updates in real-time - AI news only"""
+    try:
+        # Force AI category only - ignore other categories
+        query = "Get the latest AI (Artificial Intelligence) related news updates. Focus ONLY on: Machine Learning, Deep Learning, Neural Networks, AI Research, AI Companies, AI Tools, AI Ethics, AI Regulations, AI Breakthroughs, and AI Applications. Return news in JSON format with title, summary, source, url, image_url, and time for each item. Filter out any non-AI content."
+        
+        result = await agent_runner.run_async(
+            agent=live_news_agent,
+            query=query,
+            session_id=request.session_id
+        )
+        
+        return {
+            "result": result.final_output,
+            "session_id": result.session_id,
+            "categories": ["ai"],  # Always AI only
+            "update_time": "live"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

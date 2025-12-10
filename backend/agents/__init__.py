@@ -11,6 +11,7 @@ from .news_research_agent import NewsResearchAgent
 from .news_summarizer_agent import NewsSummarizerAgent
 from .multi_agent_newsroom_system import MultiAgentNewsroomSystem
 from .ultimate_ai_news_agent import UltimateAINewsAgent
+from .live_news_agent import LiveNewsAgent
 from .agent_runner import AgentRunner
 
 __all__ = [
@@ -24,6 +25,7 @@ __all__ = [
     "NewsSummarizerAgent",
     "MultiAgentNewsroomSystem",
     "UltimateAINewsAgent",
+    "LiveNewsAgent",
     "AgentRunner",
 ]
 
